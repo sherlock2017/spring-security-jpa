@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HomeResource {
 
-    @GetMapping("/")
+    @GetMapping({"/","/home"})
     public String home(){
-        return ("<h1>Welcome</h1>");
+        return("<h1>Welcome Home</h1>");
     }
 
     @GetMapping("/user")
