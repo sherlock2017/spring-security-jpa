@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4" layout:decorate="~{layout}" lang="en">
+<head th:fragment="head-fragment">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
+    <title>Home</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div sec:authorize="isAuthenticated()">
+        <div class="container-fluid">
+            <h1>Welcome</h1>
+            <a th:href="@{/success}" class="btn btn-primary btn-md">Success</a>
+            <a th:href="@{/fail}" class="btn btn-danger btn-md">Fail</a>
+        </div>
+    </div>
+    <div sec:authorize="isAnonymous()">
+        <h3>You are not logged in...</h3>
+    </div>
+</div>
+</body>
+</html>

@@ -4,7 +4,6 @@ import com.learning.service.CookieService;
 import com.learning.service.MyUserDetailsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,16 +33,16 @@ public class CookieAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("Starting cookieAutheticationFilter :: doFilterInternal");
+        log.info("Starting cookieAuthenticationFilter :: doFilterInternal");
 
         Cookie[] cookies = request.getCookies();
         if(cookies != null){
             log.info("Found {} cookies", cookies.length);
             Optional<Cookie> username = Arrays.stream(cookies).filter(cookie -> cookie.getName().equals("username")).findFirst();
-            //username.orElseThrow(() -> new InsufficientAuthenticationException("username was not found"));
+
             if(username.isPresent()){
                 String usernameStr = username.get().getValue();
-                verifyUser(usernameStr, request, response);
+                authenticateUser(usernameStr, request, response);
             }
             else{
                 log.info("Found no username cookie");
@@ -53,11 +52,11 @@ public class CookieAuthenticationFilter extends OncePerRequestFilter {
             log.info("Found no cookies");
         }
 
-        log.info("Finished cookieAutheticationFilter :: doFilterInternal");
+        log.info("Finished cookieAuthenticationFilter :: doFilterInternal");
         filterChain.doFilter(request, response);
     }
 
-    private void verifyUser(String usernameStr, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void authenticateUser(String usernameStr, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         try{
             UserDetails userDetails = myUserDetailsService.loadUserByUsername(usernameStr);
@@ -76,7 +75,10 @@ public class CookieAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         catch (UsernameNotFoundException e){
-            log.info("User not found :: {}", e);
+            log.warn("{}",e);
+            Cookie empty = new Cookie(CookieService.AUTH_COOKIE, "");
+            empty.setMaxAge(0);
+            response.addCookie(empty);
             SecurityContextHolder.clearContext();
         }
     }

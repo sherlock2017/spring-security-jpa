@@ -4,7 +4,6 @@ import com.learning.service.CookieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -14,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @EnableWebSecurity
 @Configuration
@@ -27,39 +27,37 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        // for JPA there is no out of the box implementation for configuration
-        // in order to work ss work with JPA we need to create an instance of user service
-        // so that ss can use to lookup user
         auth.userDetailsService(userDetailsService);
     }
 
-    /**
-     * This is the authorization setup for our app
-     *
-     * @param http
-     * @throws Exception
-     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-            http.authorizeRequests()
-                    .antMatchers("/admin").hasAuthority("ADMIN")
-                    .antMatchers("/user").hasAnyAuthority("ADMIN", "USER")
-                    .antMatchers("/fail").denyAll()
-                    .antMatchers("/").permitAll()
-                    .and()
-                    .formLogin().loginPage("/login").permitAll()
-                    .successHandler(new AuthSuccessHandler(getCookieService())).permitAll()
-                    .and()
-                    .exceptionHandling().accessDeniedPage("/accessDenied")
-                    .and()
-                    .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.authorizeRequests()
+                .antMatchers("/success").hasAuthority("ADMIN")
+                .antMatchers("/fail").denyAll()
+                .antMatchers("/home").permitAll()
+                .and()
+                .formLogin()
+                .loginPage("/login").permitAll()
+                .successHandler(new AuthSuccessHandler(getCookieService()))
+                .and()
+                .exceptionHandling()
+                .accessDeniedPage("/accessDenied")
+                .and()
+                .logout()
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .deleteCookies(CookieService.AUTH_COOKIE)
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.NEVER);
 
         http.addFilterBefore(cookieAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
+        http.csrf().disable();
     }
 
-    public CookieService getCookieService(){
+    @Bean
+    public CookieService getCookieService() {
         return new CookieService();
     }
 
@@ -67,9 +65,4 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public PasswordEncoder getPasswordEncoder() {
         return NoOpPasswordEncoder.getInstance();
     }
-
-
-
-
-
 }
