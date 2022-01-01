@@ -1,5 +1,6 @@
 package com.learning.service;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
@@ -35,5 +36,6 @@ public class CookieService {
         Cookie empty = new Cookie(CookieService.AUTH_COOKIE, "");
         empty.setMaxAge(0);
         response.addCookie(empty);
+        SecurityContextHolder.clearContext();
     }
 }

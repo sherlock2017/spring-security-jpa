@@ -27,7 +27,6 @@ public class MyUserDetails implements UserDetails {
         this.authorities = Arrays.stream(user.getRoles().split(",")).
                 map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
-        System.out.println(authorities);
     }
 
     @Override
@@ -37,7 +36,7 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return "";
     }
 
     @Override

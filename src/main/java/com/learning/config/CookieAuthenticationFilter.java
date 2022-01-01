@@ -37,15 +37,15 @@ public class CookieAuthenticationFilter extends OncePerRequestFilter {
 
         Cookie[] cookies = request.getCookies();
         if(cookies != null){
-            log.info("Found {} cookies", cookies.length);
             Optional<Cookie> username = Arrays.stream(cookies).filter(cookie -> cookie.getName().equals("username")).findFirst();
 
             if(username.isPresent()){
+                log.info("Found auth cookie");
                 String usernameStr = username.get().getValue();
                 authenticateUser(usernameStr, request, response);
             }
             else{
-                log.info("Found no username cookie");
+                log.info("Found no auth cookie");
             }
         }
         else{
@@ -76,10 +76,7 @@ public class CookieAuthenticationFilter extends OncePerRequestFilter {
         }
         catch (UsernameNotFoundException e){
             log.warn("{}",e);
-            Cookie empty = new Cookie(CookieService.AUTH_COOKIE, "");
-            empty.setMaxAge(0);
-            response.addCookie(empty);
-            SecurityContextHolder.clearContext();
+            cookieService.resetAuthCookie(response);
         }
     }
 }

@@ -40,6 +40,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .loginPage("/login").permitAll()
                 .successHandler(new AuthSuccessHandler(getCookieService()))
+                .failureHandler(new AuthFailureHandler(getCookieService()))
                 .and()
                 .exceptionHandling()
                 .accessDeniedPage("/accessDenied")
