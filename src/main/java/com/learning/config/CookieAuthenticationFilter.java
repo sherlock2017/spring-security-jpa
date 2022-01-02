@@ -1,7 +1,7 @@
 package com.learning.config;
 
 import com.learning.service.CookieService;
-import com.learning.service.MyUserDetailsService;
+import com.learning.service.CraftUserDetailsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,8 +25,10 @@ import java.util.Optional;
 @Component
 public class CookieAuthenticationFilter extends OncePerRequestFilter {
 
+    public static final String USERNAME = "username";
+
     @Autowired
-    private MyUserDetailsService myUserDetailsService;
+    private CraftUserDetailsService craftUserDetailsService;
 
     @Autowired
     private CookieService cookieService;
@@ -37,7 +39,7 @@ public class CookieAuthenticationFilter extends OncePerRequestFilter {
 
         Cookie[] cookies = request.getCookies();
         if(cookies != null){
-            Optional<Cookie> username = Arrays.stream(cookies).filter(cookie -> cookie.getName().equals("username")).findFirst();
+            Optional<Cookie> username = Arrays.stream(cookies).filter(cookie -> cookie.getName().equalsIgnoreCase(USERNAME)).findFirst();
 
             if(username.isPresent()){
                 log.info("Found auth cookie");
@@ -59,10 +61,9 @@ public class CookieAuthenticationFilter extends OncePerRequestFilter {
     private void authenticateUser(String usernameStr, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         try{
-            UserDetails userDetails = myUserDetailsService.loadUserByUsername(usernameStr);
+            UserDetails userDetails = craftUserDetailsService.loadUserByUsername(usernameStr);
 
             if(userDetails != null){
-                log.info("Found User Details :: {} ", userDetails.toString());
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
@@ -75,7 +76,7 @@ public class CookieAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         catch (UsernameNotFoundException e){
-            log.warn("{}",e);
+            e.printStackTrace();
             cookieService.resetAuthCookie(response);
         }
     }

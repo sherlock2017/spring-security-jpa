@@ -1,28 +1,26 @@
 package com.learning.models;
 
-import lombok.Data;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @ToString
-public class MyUserDetails implements UserDetails {
+public class CraftUserDetails implements UserDetails {
 
     private String userName;
     private String password;
     private boolean active;
     private List<GrantedAuthority> authorities;
 
-    MyUserDetails() {
-    }
-
-    public MyUserDetails(User user) {
+    public CraftUserDetails(User user) {
         this.userName = user.getUserName();
-        this.password = user.getPassword();
+        this.password = user.getPassword() == null ? "" : user.getPassword();
         this.active = user.isActive();
         this.authorities = Arrays.stream(user.getRoles().split(",")).
                 map(SimpleGrantedAuthority::new)
@@ -36,7 +34,7 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return "";
+        return password;
     }
 
     @Override

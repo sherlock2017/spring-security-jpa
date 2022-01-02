@@ -25,6 +25,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private CookieAuthenticationFilter cookieAuthenticationFilter;
 
+    @Autowired
+    private AuthSuccessHandler authSuccessHandler;
+
+    @Autowired
+    private AuthFailureHandler authFailureHandler;
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService);
@@ -39,8 +45,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .formLogin()
                 .loginPage("/login").permitAll()
-                .successHandler(new AuthSuccessHandler(getCookieService()))
-                .failureHandler(new AuthFailureHandler(getCookieService()))
+                .successHandler(authSuccessHandler)
+                .failureHandler(authFailureHandler)
                 .and()
                 .exceptionHandling()
                 .accessDeniedPage("/accessDenied")

@@ -1,6 +1,6 @@
 package com.learning.config;
 
-import com.learning.models.MyUserDetails;
+import com.learning.models.CraftUserDetails;
 import com.learning.service.CookieService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,17 +23,12 @@ public class AuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessHa
     @Autowired
     private CookieService cookieService;
 
-    AuthSuccessHandler(CookieService cookieService){
-        super();
-        this.cookieService = cookieService;
-    }
-
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("Started onAuthenticationSuccess");
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Object principal = securityContext.getAuthentication().getPrincipal();
-        String principalStr = ((MyUserDetails)principal).getUsername();
+        String principalStr = ((CraftUserDetails)principal).getUsername();
 
         response.addCookie(cookieService.createAuthCookie(principalStr));
         //response.sendRedirect("/home");

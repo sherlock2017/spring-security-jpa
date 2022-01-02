@@ -13,8 +13,8 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-12 text-center">
-                    <span class="display-1 d-block">500</span>
-                    <div class="mb-4 lead">OOPS! SOME ISSUE OCCURED</div>
+                    <span class="display-1 d-block" th:text="${status}">status</span>
+                    <div class="mb-4 lead" th:text="${error}">error</div>
                     <a th:href="@{/home}" class="btn btn-link">Back to Home</a>
                 </div>
             </div>

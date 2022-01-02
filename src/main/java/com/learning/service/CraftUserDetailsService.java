@@ -1,6 +1,6 @@
 package com.learning.service;
 
-import com.learning.models.MyUserDetails;
+import com.learning.models.CraftUserDetails;
 import com.learning.models.User;
 import com.learning.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class MyUserDetailsService implements UserDetailsService {
+public class CraftUserDetailsService implements UserDetailsService {
 
     @Autowired
     UserRepository userRepository;
@@ -21,6 +21,6 @@ public class MyUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByUserName(userName);
         user.orElseThrow(() -> new UsernameNotFoundException("User not found: "+userName));
-        return user.map(MyUserDetails::new).get();
+        return user.map(CraftUserDetails::new).get();
     }
 }
